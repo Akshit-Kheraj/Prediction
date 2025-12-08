@@ -28,6 +28,10 @@ import xgboost as xgb
 import warnings
 warnings.filterwarnings('ignore')
 
+# Constants
+STATUS_READY = '✅ Ready'
+COL_CANCER_PROB = 'Cancer_Probability_%'
+
 # Page configuration
 st.set_page_config(
     page_title="Cancer Diagnostic Prediction System",
@@ -327,7 +331,7 @@ elif page == "📤 Upload & Train":
                     results_df = pd.DataFrame({
                         'Model': ['Random Forest', 'Gradient Boosting', 'XGBoost'],
                         'Accuracy': [rf_accuracy, gb_accuracy, xgb_accuracy],
-                        'Status': ['✅ Ready', '✅ Ready', '✅ Ready']
+                        'Status': [STATUS_READY, STATUS_READY, STATUS_READY]
                     })
                     results_df['Accuracy'] = results_df['Accuracy'].apply(lambda x: f"{x*100:.2f}%")
                     st.dataframe(results_df, use_container_width=True)
@@ -407,7 +411,7 @@ elif page == "🔮 Predict":
                     # Create results dataframe
                     results_df = predict_df.copy()
                     results_df['Cancer_Prediction'] = ['Cancer' if p == 1 else 'Non-Cancer' for p in ensemble_pred]
-                    results_df['Cancer_Probability_%'] = (ensemble_proba * 100).round(2)
+                    results_df[COL_CANCER_PROB] = (ensemble_proba * 100).round(2)
                     results_df['Risk_Category'] = [r[0] for r in risk_categories]
                     results_df['Risk_Icon'] = [r[1] for r in risk_categories]
                     results_df['RF_Probability_%'] = (rf_proba * 100).round(2)
@@ -470,9 +474,9 @@ elif page == "🔮 Predict":
                     display_cols = st.multiselect(
                         "Select columns to display:",
                         options=results_df.columns.tolist(),
-                        default=['Sample_ID', 'Cancer_Prediction', 'Cancer_Probability_%', 
+                        default=['Sample_ID', 'Cancer_Prediction', COL_CANCER_PROB, 
                                 'Risk_Category', 'Risk_Icon'] if 'Sample_ID' in results_df.columns 
-                                else ['Cancer_Prediction', 'Cancer_Probability_%', 'Risk_Category', 'Risk_Icon']
+                                else ['Cancer_Prediction', COL_CANCER_PROB, 'Risk_Category', 'Risk_Icon']
                     )
                     
                     if display_cols:
@@ -494,7 +498,7 @@ elif page == "🔮 Predict":
                     
                     with col2:
                         # Filter high risk patients
-                        high_risk_df = results_df[results_df['Cancer_Probability_%'] >= 60]
+                        high_risk_df = results_df[results_df[COL_CANCER_PROB] >= 60]
                         high_risk_csv = high_risk_df.to_csv(index=False)
                         st.download_button(
                             label="⚠️ Download High Risk Only",
@@ -561,10 +565,10 @@ elif page == "📊 Analytics":
         # Probability distribution
         fig = px.histogram(
             results_df,
-            x='Cancer_Probability_%',
+            x=COL_CANCER_PROB,
             nbins=50,
             title="Cancer Probability Distribution",
-            labels={'Cancer_Probability_%': 'Cancer Probability (%)'},
+            labels={COL_CANCER_PROB: 'Cancer Probability (%)'},
             color_discrete_sequence=['#3498db']
         )
         fig.add_vline(x=30, line_dash="dash", line_color="green", annotation_text="Low Risk")
@@ -598,7 +602,7 @@ elif page == "📊 Analytics":
             feature_cols = st.session_state.numeric_features
             corr_data = []
             for feature in feature_cols:
-                corr = results_df[feature].corr(results_df['Cancer_Probability_%'])
+                corr = results_df[feature].corr(results_df[COL_CANCER_PROB])
                 corr_data.append({'Feature': feature, 'Correlation': corr})
             
             corr_df = pd.DataFrame(corr_data).sort_values('Correlation', ascending=False)
@@ -621,7 +625,7 @@ elif page == "📊 Analytics":
         thresholds = [30, 60, 85]
         threshold_counts = []
         for t in thresholds:
-            count = (results_df['Cancer_Probability_%'] >= t).sum()
+            count = (results_df[COL_CANCER_PROB] >= t).sum()
             threshold_counts.append(count)
         
         fig = go.Figure(data=[
@@ -642,8 +646,8 @@ elif page == "📊 Analytics":
         
         # Top high-risk patients
         st.markdown("### ⚠️ Top 10 Highest Risk Patients")
-        high_risk_cols = ['Sample_ID', 'Cancer_Probability_%', 'Risk_Category'] if 'Sample_ID' in results_df.columns else ['Cancer_Probability_%', 'Risk_Category']
-        top_risk = results_df.nlargest(10, 'Cancer_Probability_%')[high_risk_cols]
+        high_risk_cols = ['Sample_ID', COL_CANCER_PROB, 'Risk_Category'] if 'Sample_ID' in results_df.columns else [COL_CANCER_PROB, 'Risk_Category']
+        top_risk = results_df.nlargest(10, COL_CANCER_PROB)[high_risk_cols]
         st.dataframe(top_risk, use_container_width=True)
     
     with tab4:
