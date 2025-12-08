@@ -91,23 +91,6 @@ with st.sidebar:
     )
     
     st.markdown("---")
-    st.markdown("### 📈 Model Performance")
-    st.info("""
-    **Top 3 Algorithms:**
-    - 🥇 Random Forest (99.95%)
-    - 🥈 Gradient Boosting (99.75%)
-    - 🥉 XGBoost (99.40%)
-    """)
-    
-    st.markdown("---")
-    st.markdown("### 🎯 Features")
-    st.success("""
-    ✅ CSV/Excel Upload
-    ✅ Real-time Predictions
-    ✅ Risk Probability Scores
-    ✅ Multi-model Ensemble
-    ✅ Interactive Visualizations
-    """)
 
 # ==================================================================================
 # HOME PAGE
@@ -119,9 +102,6 @@ if page == "🏠 Home":
     with col1:
         st.markdown("""
         ## Welcome to the Cancer Diagnostic Prediction System
-        
-        This advanced AI system uses **machine learning** to predict cancer diagnosis 
-        and assess future cancer risk based on patient biomarkers and clinical data.
         
         ### 🔬 What We Analyze:
         """)
@@ -156,12 +136,6 @@ if page == "🏠 Home":
         """)
     
     with col2:
-        st.markdown("### 🏆 System Highlights")
-        
-        st.metric("Model Accuracy", "99.95%", "+0.25%")
-        st.metric("Patients Analyzed", "10,000+", "+2,000")
-        st.metric("Prediction Speed", "< 1 sec", "Real-time")
-        
         st.markdown("### 📊 Risk Categories")
         risk_data = pd.DataFrame({
             'Category': ['Low', 'Moderate', 'High', 'Very High'],
