@@ -44,8 +44,13 @@ echo "NPM version: $(npm -v)"
 
 # Step 3: Install MongoDB
 echo -e "${YELLOW}[3/10] Installing MongoDB ${MONGODB_VERSION}...${NC}"
-curl -fsSL https://www.mongodb.org/static/pgp/server-${MONGODB_VERSION}.asc | \
-   sudo gpg --batch --yes -o /usr/share/keyrings/mongodb-server-${MONGODB_VERSION}.gpg --dearmor
+sudo apt-get install -y gnupg curl
+
+# Download key to file first to avoid TTY issues
+curl -fsSL https://www.mongodb.org/static/pgp/server-${MONGODB_VERSION}.asc -o mongo.asc
+sudo gpg --batch --yes --dearmor -o /usr/share/keyrings/mongodb-server-${MONGODB_VERSION}.gpg mongo.asc
+rm -f mongo.asc
+
 echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-${MONGODB_VERSION}.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/${MONGODB_VERSION} multiverse" | \
    sudo tee /etc/apt/sources.list.d/mongodb-org-${MONGODB_VERSION}.list
 sudo apt update
