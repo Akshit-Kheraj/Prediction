@@ -28,6 +28,8 @@ APP_DIR="/var/www/medstargenx"
 REPO_URL="https://github.com/Akshit-Kheraj/Prediction.git"
 MONGODB_VERSION="7.0"
 
+export DEBIAN_FRONTEND=noninteractive
+
 # Step 1: System Update
 echo -e "${YELLOW}[1/10] Updating system packages...${NC}"
 sudo apt update
@@ -43,7 +45,7 @@ echo "NPM version: $(npm -v)"
 # Step 3: Install MongoDB
 echo -e "${YELLOW}[3/10] Installing MongoDB ${MONGODB_VERSION}...${NC}"
 curl -fsSL https://www.mongodb.org/static/pgp/server-${MONGODB_VERSION}.asc | \
-   sudo gpg -o /usr/share/keyrings/mongodb-server-${MONGODB_VERSION}.gpg --dearmor
+   sudo gpg --batch --yes -o /usr/share/keyrings/mongodb-server-${MONGODB_VERSION}.gpg --dearmor
 echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-${MONGODB_VERSION}.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/${MONGODB_VERSION} multiverse" | \
    sudo tee /etc/apt/sources.list.d/mongodb-org-${MONGODB_VERSION}.list
 sudo apt update
